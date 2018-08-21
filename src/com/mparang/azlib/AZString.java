@@ -126,6 +126,41 @@ public class AZString {
         return AZString.toFloat(value, 0f);
     }
 
+    public long toLong() {
+      return toLong(0);
+    }
+
+    public long toLong(long defaultValue) {
+      long rtnValue = 0;
+      if (this.value == null) {
+        rtnValue = defaultValue;
+      }
+      else {
+        try {
+          rtnValue = Long.parseLong(this.value.toString());
+        }
+        catch (Exception ex) {
+          rtnValue = defaultValue;
+        }
+      }
+      return rtnValue;
+    }
+
+    public static long toLong(String value, long defaultValue) {
+      long rtnValue = 0;
+      try {
+        rtnValue = Long.parseLong(value);
+      }
+      catch (Exception ex) {
+        rtnValue = defaultValue;
+      }
+      return rtnValue;
+    }
+
+    public static long toLong(String value) {
+      return AZString.toLong(value, 0);
+    }
+
     public static String getRandom() {
       int randomLength = 6;
       Random random = new Random();
