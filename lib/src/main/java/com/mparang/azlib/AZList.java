@@ -126,6 +126,59 @@ public class AZList implements Iterable<AZData> {
         return _list.size();
     }
 
+    private String getJsonSafeString(String src) {
+        return src
+            .replaceAll("\"", "\\\\\"")
+            .replaceAll("\b", "\\\\\b")
+            .replaceAll("\f", "\\\\\f")
+            .replaceAll("\n", "\\\\\n")
+            .replaceAll("\r", "\\\\\r")
+            .replaceAll("\t", "\\\\\t")
+            .replaceAll("\\\\", "\\\\\\\\")
+            .replaceAll("/", "\\\\/");
+    }
+
+    private String getJsonElementString(String key, Object value) {
+        StringBuilder rtnVal = new StringBuilder();
+        //
+        if (
+            value instanceof Short || value instanceof Integer || value instanceof Long ||
+                value instanceof Float || value instanceof Double
+        ) {
+            rtnVal.append("\"" + key + "\":" + value);
+        }
+        else if (value instanceof Character) {
+            switch ((char)value) {
+                case '"':
+                    rtnVal.append("\"" + key+ "\":\"" + "\\\"" + "\"");
+                    break;
+                case '/':
+                    rtnVal.append("\"" + key + "\":\"" + "\\/" + "\"");
+                    break;
+                default:
+                    rtnVal.append("\"" + key + "\":\"" + value + "\"");
+                    break;
+            }
+        }
+        else if (value instanceof String) {
+            rtnVal.append("\"" + key + "\":\"" + getJsonSafeString((String)value) + "\"");
+        }
+        else if (value instanceof Boolean) {
+            rtnVal.append("\"" + key + "\":" + value);
+        }
+        else if (value instanceof AZData || value instanceof AZList) {
+            rtnVal.append("\"" + key + "\":" + value);
+        }
+        else if (value == null) {
+            rtnVal.append("\"" + key + "\":" + value);
+        }
+        else {
+            rtnVal.append("\"" + key + "\":\"" + value + "\"");
+        }
+        //
+        return rtnVal.toString();
+    }
+
     @Override
     public String toString() {
         StringBuilder rtnVal = new StringBuilder();
@@ -164,7 +217,7 @@ public class AZList implements Iterable<AZData> {
     }
 
     public class Attribute {
-        protected HashMap<String, Object> _attrMap;
+        private HashMap<String, Object> _attrMap;
         public Attribute() {
             _attrMap = new HashMap<>();
         }
@@ -193,14 +246,43 @@ public class AZList implements Iterable<AZData> {
             return _attrMap.containsKey(key);
         }
 
-        public Object get(String  key) {
-            if (!hasKey(key)) return null;
-            return _attrMap.get(key);
+        public <T> T get(String key, T defaultValue) {
+            if (!hasKey(key)) return defaultValue;
+            return (T)_attrMap.get(key);
+        }
+
+        public <T> T get(String key) {
+            return get(key, null);
         }
 
         public Object get(int index) {
             Object[] keys = _attrMap.keySet().toArray();
             return _attrMap.get(keys[index]);
+        }
+
+        public String[] getAllKeys() {
+            return _attrMap.keySet().toArray(new String[0]);
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder rtnVal = new StringBuilder();
+            //
+            rtnVal.append("{");
+            //
+            Object[] keys = this.getAllKeys();
+            for (int cnti = 0; cnti < keys.length; cnti++) {
+                String key = (String)keys[cnti];
+                Object value = _attrMap.get(key);
+                //
+                if (cnti > 0) rtnVal.append(",");
+                //
+                rtnVal.append(getJsonElementString(key, value));
+            }
+            //
+            rtnVal.append("}");
+            //
+            return rtnVal.toString();
         }
     }
 }

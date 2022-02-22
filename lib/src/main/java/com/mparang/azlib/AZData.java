@@ -405,9 +405,13 @@ public class AZData implements Iterable<AZData.KeyLink> {
             return _attrMap.containsKey(key);
         }
 
-        public Object get(String  key) {
-            if (!hasKey(key)) return null;
-            return _attrMap.get(key);
+        public <T> T get(String key, T defaultValue) {
+            if (!hasKey(key)) return defaultValue;
+            return (T)_attrMap.get(key);
+        }
+
+        public <T> T get(String key) {
+            return get(key, null);
         }
 
         public Object get(int index) {
