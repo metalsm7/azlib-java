@@ -6,10 +6,28 @@
  * User Manual available at https://docs.gradle.org/7.3.1/userguide/building_java_projects.html
  */
 
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "com.github.jengelman.gradle.plugins:shadow:6.0.0"
+    }
+}
+
 plugins {
+    id 'com.github.johnrengelman.shadow' version '6.0.0'
     // Apply the java-library plugin for API and implementation separation.
     id 'java-library'
 }
+
+ext.set('group_id', 'com.mparang')
+ext.set('artifact_id', 'azlib')
+ext.set('shadow_postfix', '-all')
+ext.set('build_version', '0.2.0')
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories {
     // Use Maven Central for resolving dependencies.
@@ -31,6 +49,29 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.22'
     testCompileOnly 'org.projectlombok:lombok:1.18.22'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
+}
+
+shadowJar {
+    //mergeServiceFiles()
+    archiveBaseName.set("$artifact_id")
+    archiveClassifier.set('')
+    archiveVersion.set("$build_version$shadow_postfix")
+    dependencies {
+        // exclude(dependency('org.projectlombok:lombok:.*'))
+    }
+    exclude '*.html'
+    exclude '*.txt'
+    exclude '*.iml'
+    exclude '*.gz'
+}
+
+jar {
+    manifest {
+        // attributes 'Main-Class': 'Test.Server'
+    }
+    archiveBaseName.set("$artifact_id")
+    archiveClassifier.set('')
+    archiveVersion.set("$build_version")
 }
 
 // tasks.named('test') {
