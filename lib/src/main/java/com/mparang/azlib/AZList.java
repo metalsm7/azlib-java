@@ -163,7 +163,7 @@ public class AZList implements Iterable<AZData> {
         return _attribute;
     }
 
-    class Attribute {
+    public class Attribute {
         protected HashMap<String, Object> _attrMap;
         public Attribute() {
             _attrMap = new HashMap<>();

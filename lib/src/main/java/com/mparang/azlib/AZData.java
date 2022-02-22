@@ -375,7 +375,7 @@ public class AZData implements Iterable<AZData.KeyLink> {
         }
     }
 
-    class Attribute {
+    public class Attribute {
         private HashMap<String, Object> _attrMap;
         public Attribute() {
             _attrMap = new HashMap<>();
